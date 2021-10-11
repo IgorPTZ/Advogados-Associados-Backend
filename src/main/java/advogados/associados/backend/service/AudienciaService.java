@@ -30,11 +30,9 @@ public class AudienciaService {
 		return audienciaRepository.save(audiencia);
 	}
 	
-	public Audiencia editarAudiencia(Audiencia parametros) {
+	public Audiencia editarAudiencia(Audiencia audiencia) {
 		
-		Audiencia audiencia = audienciaRepository.findById(parametros.getId()).get();
-		
-		if(parametros.getFlagPrecatoria() == false) {
+		if(audiencia.getFlagPrecatoria() == false) {
 			
 			audiencia.setNumeroDoProcessoGerado(null);
 			

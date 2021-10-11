@@ -58,10 +58,6 @@ public class ProcessoController {
 			
 			Processo processo = new Processo();
 			
-			processo.setClientes(new ArrayList<Cliente>());
-			
-			processo.getClientes().add(clienteService.obterClientePorId(clienteId));
-			
 			model.addObject("clienteId", this.clienteId);
 			
 			model.addObject("page", page);

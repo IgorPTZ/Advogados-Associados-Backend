@@ -1,25 +1,17 @@
 package advogados.associados.backend.controller;
 
-import java.util.ArrayList;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
 
 import advogados.associados.backend.model.Cliente;
-import advogados.associados.backend.model.Contato;
 import advogados.associados.backend.service.ClienteService;
-import advogados.associados.backend.util.PesquisaDeClientes;
 
 
 @RestController
@@ -29,8 +21,23 @@ public class ClienteController {
 	@Autowired
 	private ClienteService clienteService;
 	
+	@RequestMapping(value="/obter", method=RequestMethod.GET) 
+	public ResponseEntity<?> obterClientePorId(@RequestParam(value="id") Long id) { // ok
+		
+		try {
+			
+			return new ResponseEntity<Cliente>(clienteService.obterClientePorId(id), HttpStatus.OK);
+		}
+		catch(Exception e) {
+			
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	@RequestMapping(value="/obter-clientes", method=RequestMethod.GET)
-	public ResponseEntity<?> obterClientes(@RequestParam(name = "pagina") Integer pagina, @RequestParam(name = "tamanho") Integer tamanho) { 
+	public ResponseEntity<?> obterClientes(@RequestParam(name = "pagina") Integer pagina, @RequestParam(name = "tamanho") Integer tamanho) { // ok
 		
 		try {
 			
@@ -44,26 +51,14 @@ public class ClienteController {
 		return null;
 	}
 	
-	@RequestMapping(value="/obter-clientes-filtrados", method=RequestMethod.POST) 
-	public ModelAndView obterClientesFiltrados(ModelAndView model, 
-			                                   @PageableDefault(size = 20) Pageable pageable,
-			                                   @ModelAttribute PesquisaDeClientes pesquisaDeClientes) { 
+	@RequestMapping(value="/obter-clientes-filtrados", method=RequestMethod.GET) 
+	public ResponseEntity<?> obterClientesFiltrados(@RequestParam(name = "pagina") Integer pagina, 
+			                                        @RequestParam(name = "tamanho") Integer tamanho,
+			                                        @RequestParam(name = "string-pesquisa") String stringDePesquisa) { // ok
 		
 		try {
 			
-			Page<Cliente> clientes = clienteService.obterClientesPaginados(pageable, pesquisaDeClientes);
-			
-			model.addObject("page", pageable.getPageNumber());
-			
-			model.addObject("size", pageable.getPageSize());
-			
-			model.addObject("pesquisaDeClientes", pesquisaDeClientes); 
-			
-			model.addObject("clientesPaginados", clientes);
-			
-			model.setViewName("cliente/listar-cliente");
-			
-			return model;
+			return new ResponseEntity<Page<Cliente>>(clienteService.obterClientesPaginados(pagina, tamanho, stringDePesquisa), HttpStatus.OK);
 		}
 		catch(Exception e) {
 			
@@ -73,139 +68,29 @@ public class ClienteController {
 		return null;
 	}
 	
-	@RequestMapping(value="/obter-cliente-por-id", method=RequestMethod.GET) 
-	public ModelAndView obterClientePorId(ModelAndView model, 
-			                              @RequestParam(value="id") Long id,
-			                              @RequestParam("page") Long page,
-						                  @RequestParam("size") Long size) {
-		
-		try {
-			
-			Cliente cliente = clienteService.obterClientePorId(id);
-			
-			model.addObject("page", page);
-			
-			model.addObject("size", size);
-			
-			model.addObject("cliente", cliente);
-			
-			model.setViewName("cliente/editar-cliente");
-			
-			return model;
-		}
-		catch(Exception e) {
-			
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
-	@RequestMapping(value="/detalhar-cliente-por-id", method=RequestMethod.GET)
-	public ModelAndView detalharClientePorId(ModelAndView model, 
-			                              @RequestParam(value="id") Long id,
-			                              @RequestParam("page") Long page,
-						                  @RequestParam("size") Long size) {
-		
-		try {
-			
-			Cliente cliente = clienteService.obterClientePorId(id);
-			
-			model.addObject("page", page);
-			
-			model.addObject("size", size);
-			
-			model.addObject("cliente", cliente);
-			
-			model.setViewName("cliente/detalhar-cliente");
-			
-			return model;
-		}
-		catch(Exception e) {
-			
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
-	@RequestMapping(value="/carregar-novo-cliente", method=RequestMethod.GET)
-	public ModelAndView carregarNovoCliente(ModelAndView model,
-											@RequestParam("page") Long page,
-								            @RequestParam("size") Long size) { 
-		
-		try {
-			
-			Cliente cliente = new Cliente();
-			
-			cliente.setContatos(new ArrayList<Contato>());
-			
-			for(int i = 0 ; i < 4 ; i++) {
-				
-				cliente.getContatos().add(new Contato());
-			}
-			
-			model.addObject("page", page);
-			
-			model.addObject("size", size);
-			
-			model.addObject("cliente", cliente);
-			
-			model.setViewName("cliente/inserir-cliente");
-			
-			return model;
-		}
-		catch(Exception e) {
-			
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
-	@RequestMapping(value="/inserir-cliente", method=RequestMethod.POST)
-	public ModelAndView inserirCliente(ModelMap model, @ModelAttribute Cliente cliente) {
+	@RequestMapping(value="/inserir", method=RequestMethod.POST)
+	public ResponseEntity<?> inserirCliente(@RequestBody Cliente cliente) { // ok
 		
 		try {
 			
 			boolean cpfECnpjNaoPreenchidos = (cliente.getCpf() == null && cliente.getCnpj() == null) || (cliente.getCpf().isEmpty() && cliente.getCnpj().isEmpty());
 			
 			if(cpfECnpjNaoPreenchidos) {
-				
-				model.addAttribute("page", 0L);
-				
-				model.addAttribute("size", 20L);
-				
-				model.addAttribute("cliente", cliente);
-				
-				model.addAttribute("mensagem", "CPF ou CNPJ devem ser preenchidos");
-								
-				return new ModelAndView("cliente/inserir-cliente", model);
+					
+			   return new ResponseEntity<String>("CPF ou CNPJ devem ser preenchidos", HttpStatus.BAD_REQUEST);
 			}
 			
-			if(cliente.getCpf().isEmpty()) {
+			if(cliente.getCpf() == null || cliente.getCpf().isEmpty()) {
 				
 				cliente.setCpf(null);
 			}
 			
-			if(cliente.getCnpj().isEmpty()) {
+			if(cliente.getCnpj() == null || cliente.getCnpj().isEmpty()) {
 				
 				cliente.setCnpj(null);
 			}
 			
-			clienteService.inserirCliente(cliente);
-			
-			Page<Cliente> clientes = clienteService.obterClientesPaginados(0L, 20L);
-			
-			model.addAttribute("page", 0L);
-			
-			model.addAttribute("size", 20L);
-			
-			model.addAttribute("clientesPaginados", clientes);
-			
-			model.addAttribute("cliente/listar-cliente");
-			
-			return new ModelAndView("redirect:/obter-clientes", model);
+			return new ResponseEntity<Cliente>(clienteService.inserirCliente(cliente),HttpStatus.OK);
 		}
 		catch(Exception e) {
 			
@@ -215,49 +100,34 @@ public class ClienteController {
 		return null;
 	}
 	
-	@RequestMapping(value="/editar-cliente", method=RequestMethod.POST)
-	public ModelAndView editarCliente(ModelMap model, @ModelAttribute Cliente cliente) {
+	@RequestMapping(value="/editar", method=RequestMethod.PUT)
+	public ResponseEntity<?> editarCliente(@RequestBody Cliente cliente) { // ok
 		
 		try {
+			
+			if(cliente.getId() == null || cliente.getId() < 1) {
+				
+				return new ResponseEntity<String>("O id e obrigatorio", HttpStatus.BAD_REQUEST);
+			}
+			
 			boolean cpfECnpjNaoPreenchidos = (cliente.getCpf() == null && cliente.getCnpj() == null) || (cliente.getCpf().isEmpty() && cliente.getCnpj().isEmpty());
 			
 			if(cpfECnpjNaoPreenchidos) {
-				
-				model.addAttribute("page", 0L);
-				
-				model.addAttribute("size", 20L);
-				
-				model.addAttribute("cliente", cliente);
-				
-				model.addAttribute("mensagem", "CPF ou CNPJ devem ser preenchidos");
-								
-				return new ModelAndView("cliente/editar-cliente", model);
+					
+			   return new ResponseEntity<String>("CPF ou CNPJ devem ser preenchidos", HttpStatus.BAD_REQUEST);
 			}
 			
-			
-			if(cliente.getCpf().isEmpty()) {
+			if(cliente.getCpf() == null || cliente.getCpf().isEmpty()) {
 				
 				cliente.setCpf(null);
 			}
 			
-			if(cliente.getCnpj().isEmpty()) {
+			if(cliente.getCnpj() == null || cliente.getCnpj().isEmpty()) {
 				
 				cliente.setCnpj(null);
 			}
 			
-			clienteService.editarCliente(cliente);
-			
-			Page<Cliente> clientes = clienteService.obterClientesPaginados(0L, 20L);
-			
-			model.addAttribute("page", 0L);
-			
-			model.addAttribute("size", 20L);
-			
-			model.addAttribute("clientesPaginados", clientes);
-			
-			model.addAttribute("cliente/listar-cliente");
-			
-			return new ModelAndView("redirect:/obter-clientes", model);
+			return new ResponseEntity<Cliente>(clienteService.editarCliente(cliente),HttpStatus.OK);
 		}
 		catch(Exception e) {
 			

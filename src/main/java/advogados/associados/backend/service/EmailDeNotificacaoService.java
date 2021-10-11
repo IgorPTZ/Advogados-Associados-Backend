@@ -32,7 +32,7 @@ public class EmailDeNotificacaoService  {
 		
 		properties.put("mail.smtp.port", "465"); //Porta do servidor da Google
 		
-		properties.put("mail.smtp.socketFactory.port", "465"); // Especifica porta do socket
+		//properties.put("mail.smtp.socketFactory.port", "465"); // Especifica porta do socket
 		
 		properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); // Classe de conexão para sockets
 	
@@ -49,7 +49,7 @@ public class EmailDeNotificacaoService  {
 		
 		Message mensagem = new MimeMessage(session);
 		
-		mensagem.setFrom(new InternetAddress(usuario)); // Remetente do email
+		mensagem.setFrom(new InternetAddress("no-reply@advogados-associado.com")); // Remetente do email
 		
 		mensagem.setRecipients(Message.RecipientType.TO, destinatario); // Destinatario do email
 		

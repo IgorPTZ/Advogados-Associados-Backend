@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import advogados.associados.backend.model.Usuario;
@@ -42,9 +43,9 @@ public class UsuarioService {
 	
 	public Usuario inserirUsuario(Usuario parametros) {
 		
-		//BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		
-		//parametros.setSenha(encoder.encode(parametros.getSenha()));
+		parametros.setSenha(encoder.encode(parametros.getSenha()));
 		
 		removerConstraint();
 		
@@ -75,11 +76,11 @@ public class UsuarioService {
 	
 	public Boolean alterarSenha(Usuario parametros) {
 		
-		//BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		
 		Usuario usuario = usuarioRepository.findById(parametros.getId()).get();
 		
-		/*if(encoder.matches(parametros.getSenha(), usuario.getSenha())) {
+		if(encoder.matches(parametros.getSenha(), usuario.getSenha())) {
 			
 			usuario.setSenha(encoder.encode(parametros.getNovaSenha()));
 			
@@ -90,11 +91,7 @@ public class UsuarioService {
 		else {
 			
 			return false;
-		}*/	
-		
-		usuarioRepository.save(usuario);
-		
-		return true;
+		}
 	}
 	
 	private void removerConstraint() {

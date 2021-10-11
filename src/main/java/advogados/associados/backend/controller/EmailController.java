@@ -3,12 +3,12 @@ package advogados.associados.backend.controller;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RestController;
 
 import advogados.associados.backend.model.Audiencia;
 import advogados.associados.backend.model.Cliente;
@@ -22,7 +22,8 @@ import advogados.associados.backend.service.EmailDeNotificacaoService;
 import advogados.associados.backend.service.PericiaService;
 import advogados.associados.backend.service.ProcessoService;
 
-@Controller
+@RestController
+@RequestMapping(value = "/email")
 public class EmailController {
 	
 	@Autowired
@@ -42,9 +43,10 @@ public class EmailController {
 	
 	
 	@RequestMapping(value="/enviar-notificacao-de-audiencia", method=RequestMethod.POST) 
-	public ModelAndView enviarNotificacaoDeAudiencia(ModelMap model, @ModelAttribute NotificacaoDeAudienciaPorEmail notificacao) { 
+	public ResponseEntity<?> enviarNotificacaoDeAudiencia(@RequestBody NotificacaoDeAudienciaPorEmail notificacao) { // ok
 		
 		try {
+			
 			Cliente cliente = clienteService.obterClientePorId(notificacao.getClienteId());
 			
 			Processo processo = processoService.obterProcessoPorId(notificacao.getProcessoId());
@@ -59,11 +61,11 @@ public class EmailController {
 					          "Horário:" + audiencia.getHorario() + "\n" +
 					          "Local:" + audiencia.getEndereco() + "\n";
 			                  
-			if(!notificacao.getObservacao().isEmpty()) {
+			if(notificacao.getObservacao() != null && !notificacao.getObservacao().isEmpty()) {
 				conteudo += "Observação:" + notificacao.getObservacao() + "\n";
 			}
 			
-			if(notificacao.getFlagTipoDeNotificacao().compareTo(2L) == 0) {
+			if(notificacao.getFlagTipoDeNotificacao() != null && notificacao.getFlagTipoDeNotificacao().compareTo(2L) == 0) {
 				conteudo += "Favor comparecer acompanhado de 3 testemunhas \n";
 			}
 			                  
@@ -72,38 +74,18 @@ public class EmailController {
 			
 			emailDeNotificacaoService.enviarEmailDeRecuperacaoDeAcesso("Aviso de Audiência", cliente.getEmail(), conteudo);
 				
-			model.addAttribute("mensagem", "Email enviado com sucesso!");
-			
-			model.addAttribute("id", processo.getId());
-			
-			model.addAttribute("clienteId", cliente.getId());
-			
-			model.addAttribute("page", 0L);
-			
-			model.addAttribute("size", 20L);
-			
-			return new ModelAndView("redirect:/detalhar-processo-por-id", model);
+			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 		}
 		catch(Exception e) {
 			
 			e.printStackTrace();
 			
-			model.addAttribute("mensagem", "Falha no envio do email de notificação da audiência. Entre em contato com o administrador do sistema");
-			
-			model.addAttribute("id", notificacao.getProcessoId());
-			
-			model.addAttribute("clienteId", notificacao.getClienteId());
-			
-			model.addAttribute("page", 0L);
-			
-			model.addAttribute("size", 20L);
-			
-			return new ModelAndView("redirect:/detalhar-processo-por-id", model);
+			return new ResponseEntity<String>("Falha no envio do email de notificação da audiência. Entre em contato com o administrador do sistema", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@RequestMapping(value="/enviar-notificacao-de-pericia", method=RequestMethod.POST) 
-	public ModelAndView enviarNotificacaoDePericia(ModelMap model, @ModelAttribute NotificacaoDePericiaPorEmail notificacao) { 
+	public ResponseEntity<?> enviarNotificacaoDePericia(@RequestBody NotificacaoDePericiaPorEmail notificacao) { // ok
 		
 		try {
 			
@@ -122,7 +104,7 @@ public class EmailController {
 			                  "Períto:" + pericia.getNomePerito() + "\n" +
 					          "Endereço:" + pericia.getEndereco() + "\n";
 			                  
-			if(!notificacao.getObservacao().isEmpty()) {
+			if(notificacao.getObservacao() != null && !notificacao.getObservacao().isEmpty()) {
 				conteudo += "Observação:" + notificacao.getObservacao() + "\n";
 			}
 			                  
@@ -131,33 +113,13 @@ public class EmailController {
 			
 			emailDeNotificacaoService.enviarEmailDeRecuperacaoDeAcesso("Aviso de Perícia", cliente.getEmail(), conteudo);
 				
-			model.addAttribute("mensagem", "Email enviado com sucesso!");
-			
-			model.addAttribute("id", processo.getId());
-			
-			model.addAttribute("clienteId", cliente.getId());
-			
-			model.addAttribute("page", 0L);
-			
-			model.addAttribute("size", 20L);
-			
-			return new ModelAndView("redirect:/detalhar-processo-por-id", model);
+			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 		}
 		catch(Exception e) {
 			
 			e.printStackTrace();
 			
-			model.addAttribute("mensagem", "Falha no envio do email de notificação da perícia. Entre em contato com o administrador do sistema");
-			
-			model.addAttribute("id", notificacao.getProcessoId());
-			
-			model.addAttribute("clienteId", notificacao.getClienteId());
-			
-			model.addAttribute("page", 0L);
-			
-			model.addAttribute("size", 20L);
-			
-			return new ModelAndView("redirect:/detalhar-processo-por-id", model);
+			return new ResponseEntity<String>("Falha no envio do email de notificação da perícia. Entre em contato com o administrador do sistema", HttpStatus.OK);
 		}
 	}
 }

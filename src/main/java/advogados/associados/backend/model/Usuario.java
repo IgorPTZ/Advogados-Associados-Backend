@@ -39,7 +39,7 @@ public class Usuario implements UserDetails{
 	
 	private String token = "";
 	
-	@OneToMany(fetch = FetchType.LAZY)
+	@OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "usuario_role",
 			  joinColumns = @JoinColumn(name = "usuario_id", referencedColumnName = "id", table = "usuario"),
 			  inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", table = "role"))			  

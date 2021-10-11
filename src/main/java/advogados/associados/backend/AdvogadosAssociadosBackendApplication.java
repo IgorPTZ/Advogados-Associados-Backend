@@ -26,8 +26,12 @@ public class AdvogadosAssociadosBackendApplication implements WebMvcConfigurer{
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		
-		/* Utilizando o CORS para liberar apenas requisições POST, PUT e GET para o cliente localhost:8080 */
+		/* Utilizando o CORS para liberar apenas requisições POST, PUT,GET, E DELETE para o cliente localhost:8080 */
 		registry.addMapping("/audiencia/**").
+		allowedMethods("*"). 
+		allowedOrigins("*");
+		
+		registry.addMapping("/cliente/**").
 		allowedMethods("*"). 
 		allowedOrigins("*");
 	}
