@@ -1,12 +1,14 @@
 package advogados.associados.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import advogados.associados.backend.model.Pericia;
@@ -14,12 +16,9 @@ import advogados.associados.backend.service.PericiaService;
 import advogados.associados.backend.service.ProcessoService;
 
 
-@Controller
+@RestController
+@RequestMapping(value = "/pericia")
 public class PericiaController {
-	
-	private Long clienteId;
-	
-	private Long processoId;
 	
 	@Autowired
 	private PericiaService periciaService;
@@ -27,36 +26,12 @@ public class PericiaController {
 	@Autowired
 	private ProcessoService processoService;
 	
-	@RequestMapping(value="/carregar-nova-pericia", method=RequestMethod.GET) 
-	public ModelAndView carregarNovaPericia(ModelAndView model,
-										    @RequestParam("clienteId") Long clienteId,
-											@RequestParam("processoId") Long processoId,
-										    @RequestParam("page") Long page,
-							                @RequestParam("size") Long size) { 
+	@RequestMapping(value="/obter", method=RequestMethod.GET) 
+	public ResponseEntity<?> carregarNovaPericia(@RequestParam("id") Long id) {  // ok
 		
 		try {
 			
-			this.clienteId = clienteId;
-			
-			this.processoId = processoId;
-			
-			Pericia pericia = new Pericia();
-			
-			pericia.setProcesso(processoService.obterProcessoPorId(processoId));
-			
-			model.addObject("pericia", pericia);
-			
-			model.addObject("clienteId", clienteId);
-			
-			model.addObject("processoId", processoId);
-			
-			model.addObject("page", page);
-			
-			model.addObject("size", size);
-			
-			model.setViewName("pericia/inserir-pericia");
-			
-			return model;
+			return new ResponseEntity<Pericia>(periciaService.obterPericiaPorId(id), HttpStatus.OK);
 		}
 		catch(Exception e) {
 			
@@ -67,22 +42,12 @@ public class PericiaController {
 	}
 	
 	
-	@RequestMapping(value="/inserir-pericia", method=RequestMethod.POST) 
-	public ModelAndView inserirPericia(ModelMap model, @ModelAttribute Pericia pericia) { 
+	@RequestMapping(value="/inserir", method=RequestMethod.POST) 
+	public ResponseEntity<?> inserirPericia(@RequestBody Pericia pericia) { // ok
 		
 		try {
 			
-			periciaService.inserirPericia(pericia);
-			
-			model.addAttribute("id", this.processoId);
-			
-			model.addAttribute("clienteId", this.clienteId);
-			
-			model.addAttribute("page", 0L);
-			
-			model.addAttribute("size", 20L);
-			
-			return new ModelAndView("redirect:/detalhar-processo-por-id", model);
+			return new ResponseEntity<Pericia>(periciaService.inserirPericia(pericia), HttpStatus.OK);
 		}
 		catch(Exception e) {
 			
@@ -92,33 +57,12 @@ public class PericiaController {
 		return null;
 	}
 	
-	@RequestMapping(value="/editar-pericia-por-id", method=RequestMethod.GET) 
-	public ModelAndView editarPericiaPorId(ModelAndView model,
-										   @RequestParam("id") Long id,
-										   @RequestParam("clienteId") Long clienteId,
-										   @RequestParam("processoId") Long processoId,
-										   @RequestParam("page") Long page,
-								           @RequestParam("size") Long size) { 
+	@RequestMapping(value="/editar", method=RequestMethod.PUT) 
+	public ResponseEntity<?> editarPericia(@RequestBody Pericia pericia) { // ok
 		
 		try {
 			
-			this.clienteId = clienteId;
-			
-			this.processoId = processoId;
-			
-			model.addObject("clienteId", clienteId);
-			
-			model.addObject("processoId", processoId);
-			
-			model.addObject("page", page);
-			
-			model.addObject("size", size);
-			
-			model.addObject("pericia", periciaService.obterPericiaPorId(id));
-			
-			model.setViewName("pericia/editar-pericia");
-			
-			return model;
+			return new ResponseEntity<Pericia>(periciaService.editarPericia(pericia), HttpStatus.OK);
 		}
 		catch(Exception e) {
 			
@@ -128,52 +72,14 @@ public class PericiaController {
 		return null;
 	}
 	
-	@RequestMapping(value="editar-pericia", method=RequestMethod.POST) 
-	public ModelAndView editarPericia(ModelMap model, @ModelAttribute Pericia pericia) { 
-		
-		try {
-			
-			periciaService.editarPericia(pericia);
-			
-			model.addAttribute("id", this.processoId);
-			
-			model.addAttribute("clienteId", this.clienteId);
-			
-			model.addAttribute("page", 0L);
-			
-			model.addAttribute("size", 20L);
-			
-			return new ModelAndView("redirect:/detalhar-processo-por-id", model);
-		}
-		catch(Exception e) {
-			
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
-	
-	@RequestMapping(value="excluir-pericia-por-id", method=RequestMethod.GET) 
-	public ModelAndView excluirPericia(ModelMap model, 		   
-			                           @RequestParam("id") Long id,
-			                           @RequestParam("clienteId") Long clienteId,
-			                           @RequestParam("processoId") Long processoId,
-			                           @RequestParam("page") Long page,
-	                                   @RequestParam("size") Long size) { 
+	@RequestMapping(value="excluir", method=RequestMethod.DELETE) 
+	public ResponseEntity<?> excluirPericia(@RequestParam("id") Long id) { // ok
 		
 		try {
 			
 			periciaService.excluirPericia(id);
 			
-			model.addAttribute("id", processoId);
-			
-			model.addAttribute("clienteId", clienteId);
-			
-			model.addAttribute("page", 0L);
-			
-			model.addAttribute("size", 20L);
-			
-			return new ModelAndView("redirect:/detalhar-processo-por-id", model);
+			return new ResponseEntity<Object>(HttpStatus.OK);
 		}
 		catch(Exception e) {
 			

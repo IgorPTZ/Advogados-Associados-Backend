@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import advogados.associados.backend.model.Audiencia;
 import advogados.associados.backend.service.AudienciaService;
-//import advogados.associados.backend.service.ProcessoService;
+import advogados.associados.backend.service.ProcessoService;
 
 
 @RestController
 @RequestMapping(value = "/audiencia")
 public class AudienciaController {
 	
-	//@Autowired
-	//private ProcessoService processoService;
+	@Autowired
+	private ProcessoService processoService;
 	
 	@Autowired
 	private AudienciaService audienciaService;
