@@ -1,5 +1,7 @@
 package advogados.associados.backend.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,4 +34,10 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 			+       " JOIN processo pr ON pr.id = processo_id"
 			+       " WHERE pr.numero ILIKE %:numeroDoProcesso% ORDER BY  cl.nome", nativeQuery = true)
 	Page<Cliente> obterClientesPaginadosPorNumeroDeProcesso(Pageable pageable, @Param("numeroDoProcesso") String numeroDoProcesso);
+	
+	@Transactional(readOnly=true)
+	@Query(value =  "SELECT * FROM cliente cl "
+			+       " JOIN processo_cliente pc ON  cl.cliente_id = pc.cliente_id"
+			+       " WHERE pc.processo_id = : ", nativeQuery = true)
+	List<Cliente> obterClientesPorProcesso(@Param("processoId") Long processoId);
 }

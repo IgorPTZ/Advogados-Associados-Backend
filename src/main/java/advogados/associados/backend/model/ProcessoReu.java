@@ -25,6 +25,18 @@ public class ProcessoReu {
 	@ManyToOne
     @JoinColumn(name = "reu_id", referencedColumnName = "id")
 	private Reu reu;
+	
+	
+	public ProcessoReu() {
+		super();
+	}
+
+	public ProcessoReu(Processo processo, Reu reu) {
+		super();
+		this.processo = processo;
+		this.reu = reu;
+	}
+	
 
 	public Long getId() {
 		return id;

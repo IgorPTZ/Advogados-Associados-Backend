@@ -25,6 +25,16 @@ public class ProcessoCliente {
 	@ManyToOne
     @JoinColumn(name = "cliente_id", referencedColumnName = "id")
 	private Cliente cliente;
+	
+	public ProcessoCliente() {
+		super();
+	}
+
+	public ProcessoCliente(Processo processo, Cliente cliente) {
+		super();
+		this.processo = processo;
+		this.cliente = cliente;
+	}
 
 	public Long getId() {
 		return id;

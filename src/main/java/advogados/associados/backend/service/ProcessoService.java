@@ -1,9 +1,15 @@
 package advogados.associados.backend.service;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import advogados.associados.backend.model.Cliente;
 import advogados.associados.backend.model.Processo;
+import advogados.associados.backend.model.ProcessoCliente;
+import advogados.associados.backend.model.ProcessoReu;
+import advogados.associados.backend.model.Reu;
 import advogados.associados.backend.repository.ProcessoClienteRepository;
 import advogados.associados.backend.repository.ProcessoRepository;
 import advogados.associados.backend.repository.ProcessoReuRepository;
@@ -42,19 +48,31 @@ public class ProcessoService {
 		return processo;
 	}
 	
-	public void excluirProcessoPorId(Long id) {
-		
-		processoRepository.deleteById(id);
-	}
-	
+	@Transactional(rollbackOn = Exception.class)
 	public Processo inserirProcesso(Processo processo) {
 		
 		Processo processoCriado = processoRepository.save(processo);
 		
+		for(Reu reu : processo.getReus()) {
+			
+			processoReuRepository.save(new ProcessoReu(processoCriado, reu));
+		}
+		
+		for(Cliente cliente : processo.getClientes()) {
+			
+			processoClienteRepository.save(new ProcessoCliente(processoCriado, cliente));
+		}
+		
+		return processoCriado;
 	}
 	
 	public Processo editarProcesso(Processo processo) {
 		
 		return processoRepository.save(processo);
+	}
+	
+	public void excluirProcessoPorId(Long id) {
+		
+		processoRepository.deleteById(id);
 	}
 }
