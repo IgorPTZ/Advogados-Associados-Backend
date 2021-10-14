@@ -1,13 +1,18 @@
 package advogados.associados.backend.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "cliente")
@@ -31,6 +36,10 @@ public class ClienteResumido implements Serializable {
 	
 	@Column(nullable = false)
 	private String email;
+	
+	@JsonIgnore
+	@ManyToMany(mappedBy = "clientes")
+	private List<Processo> processos;
 
 	public Long getId() {
 		return id;

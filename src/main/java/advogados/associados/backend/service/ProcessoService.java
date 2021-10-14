@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import advogados.associados.backend.model.Processo;
+import advogados.associados.backend.repository.ProcessoClienteRepository;
 import advogados.associados.backend.repository.ProcessoRepository;
+import advogados.associados.backend.repository.ProcessoReuRepository;
 
 
 @Service
@@ -12,6 +14,12 @@ public class ProcessoService {
 	
 	@Autowired
 	private ProcessoRepository processoRepository;
+	
+	@Autowired
+	private ProcessoClienteRepository processoClienteRepository;
+	
+	@Autowired
+	private ProcessoReuRepository processoReuRepository;
 	
 	public Processo obterProcessoPorId(Long id) {
 		

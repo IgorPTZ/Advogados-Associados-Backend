@@ -3,16 +3,11 @@ package advogados.associados.backend.model;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
@@ -31,23 +26,17 @@ public class Processo implements Serializable {
 	@ManyToOne
 	private SituacaoDoProcesso situacao;
 
-	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
-	@JoinTable(name = "processo_reu", 
-	           joinColumns = @JoinColumn(name = "processo_id"), 
-	           inverseJoinColumns = @JoinColumn(name = "reu_id"))
-	private List<ReuResumido> reus;
-
-	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.LAZY)
-	@JoinTable(name = "processo_cliente", 
-	           joinColumns = @JoinColumn(name = "processo_id"), 
-	           inverseJoinColumns = @JoinColumn(name = "cliente_id"))
-	private List<ClienteResumido> clientes;
-
 	@Column(nullable = false)
 	private String observacao;
 	
 	@Transient
 	private String nomeDosReus;
+	
+	@Transient
+	private List<Reu> reus;
+
+	@Transient
+	private List<Cliente> clientes;
 
 	public Long getId() {
 		return id;
@@ -73,19 +62,19 @@ public class Processo implements Serializable {
 		this.situacao = situacao;
 	}
 
-	public List<ReuResumido> getReus() {
+	public List<Reu> getReus() {
 		return reus;
 	}
 
-	public void setReus(List<ReuResumido> reus) {
+	public void setReus(List<Reu> reus) {
 		this.reus = reus;
 	}
 
-	public List<ClienteResumido> getClientes() {
+	public List<Cliente> getClientes() {
 		return clientes;
 	}
 
-	public void setClientes(List<ClienteResumido> clientes) {
+	public void setClientes(List<Cliente> clientes) {
 		this.clientes = clientes;
 	}
 

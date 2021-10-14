@@ -1,38 +1,30 @@
 package advogados.associados.backend.model;
 
-import java.io.Serializable;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
-@Table(name = "reu")
-public class ReuResumido implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+@Table(name = "processo_cliente")
+public class ProcessoCliente {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id")
 	private Long id;
 	
-	@Column(nullable = false)
-	private String nome;
+	@ManyToOne
+    @JoinColumn(name = "processo_id", referencedColumnName = "id")
+	private Processo processo;
 	
-	private String cpf;
-	
-	private String cnpj;
-	
-	@JsonIgnore
-	@ManyToMany(mappedBy = "reus")
-	private List<Processo> processos;
+	@ManyToOne
+    @JoinColumn(name = "cliente_id", referencedColumnName = "id")
+	private Cliente cliente;
 
 	public Long getId() {
 		return id;
@@ -42,28 +34,20 @@ public class ReuResumido implements Serializable {
 		this.id = id;
 	}
 
-	public String getNome() {
-		return nome;
+	public Processo getProcesso() {
+		return processo;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setProcesso(Processo processo) {
+		this.processo = processo;
 	}
 
-	public String getCpf() {
-		return cpf;
+	public Cliente getCliente() {
+		return cliente;
 	}
 
-	public void setCpf(String cpf) {
-		this.cpf = cpf;
-	}
-
-	public String getCnpj() {
-		return cnpj;
-	}
-
-	public void setCnpj(String cnpj) {
-		this.cnpj = cnpj;
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
 	}
 
 	@Override
@@ -82,7 +66,7 @@ public class ReuResumido implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ReuResumido other = (ReuResumido) obj;
+		ProcessoCliente other = (ProcessoCliente) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
