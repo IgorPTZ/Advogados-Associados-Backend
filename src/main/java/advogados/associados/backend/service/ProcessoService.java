@@ -49,7 +49,8 @@ public class ProcessoService {
 	
 	public Processo inserirProcesso(Processo processo) {
 		
-		return processoRepository.save(processo);
+		Processo processoCriado = processoRepository.save(processo);
+		
 	}
 	
 	public Processo editarProcesso(Processo processo) {
